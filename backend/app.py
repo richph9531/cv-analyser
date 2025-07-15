@@ -9,7 +9,7 @@ import extractors
 from analyzer import analyze_cv
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["https://richph9531.github.io", "http://localhost:3000"], supports_credentials=True)
 
 # Configure upload folder
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
