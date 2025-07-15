@@ -110,6 +110,26 @@ def save_criteria():
 @app.route('/api/criteria', methods=['GET'])
 def get_criteria():
     try:
+        # Check if criteria file exists, if not create it with default criteria
+        if not os.path.exists(CRITERIA_FILE):
+            # Create the directory if it doesn't exist
+            os.makedirs(os.path.dirname(CRITERIA_FILE), exist_ok=True)
+            
+            # Default QA Engineer criteria from memory
+            default_criteria = """QUALITY FOCUSED: Shift left mentality, risk mitigation, testability across SDLC, test methodology knowledge
+TESTING KNOWLEDGE: Wide range of testing skills, non-functional testing concerns, requirements definition
+COLLABORATIVE: Team-focused, sees testing as team activity, knowledge sharing, mediation
+TEST ARCHITECTURE: Tool selection, architecture discussions, CI/CD appreciation, pipeline design
+DEVELOPMENT SKILLS: Multiple languages, clean code, production/test code contributions, debugging
+ADAPTABLE: Pragmatic, self-organizing, not a quality gateway, independent work
+CLIENT FOCUSED: Empathy, value delivery, holistic awareness, diplomacy
+ANALYTICAL: Inquisitive, detail-oriented, well-organized, continuous learning
+COMMUNITY: Knowledge sharing, seeking advice, coaching/mentoring"""
+            
+            with open(CRITERIA_FILE, 'w') as f:
+                json.dump({'criteria': default_criteria}, f)
+        
+        # Now read the file (either existing or newly created)
         with open(CRITERIA_FILE, 'r') as f:
             data = json.load(f)
             return jsonify(data)
