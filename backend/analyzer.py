@@ -240,7 +240,16 @@ def validate_and_correct_result(result):
             
             # Add a note about the correction
             if 'justification' in result:
-                result['justification'] += "\n\n[NOTE: This assessment was automatically corrected to follow the strict evaluation criteria. Any category with 'Weak evidence' or 'No evidence' results in an automatic fail.]"
+                correction_note = "[NOTE: This assessment was automatically corrected to follow the strict evaluation criteria. Any category with 'Weak evidence' or 'No evidence' results in an automatic fail.]"
+                
+                # Handle different justification formats
+                if isinstance(result['justification'], list):
+                    result['justification'].append(correction_note)
+                elif isinstance(result['justification'], str):
+                    result['justification'] = result['justification'] + "\n\n" + correction_note
+                else:
+                    # If it's neither a list nor a string, convert to a list
+                    result['justification'] = [str(result['justification']), correction_note]
         
         return result
     
