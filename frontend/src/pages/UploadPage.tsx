@@ -5,7 +5,6 @@ import {
   Button, 
   Paper, 
   Box,
-  TextField,
   CircularProgress,
   Alert,
   AlertTitle
@@ -20,7 +19,6 @@ const UploadPage: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [criteria, setCriteria] = useState<string>('');
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -62,11 +60,6 @@ const UploadPage: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
-      
-      // Add criteria if provided
-      if (criteria.trim()) {
-        formData.append('criteria', criteria);
-      }
 
       const response = await axios.post(`${config.apiUrl}/api/upload`, formData, {
         headers: {
@@ -96,7 +89,7 @@ const UploadPage: React.FC = () => {
       
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="body1" paragraph>
-          Upload a candidate's CV in PDF, DOCX, or TXT format. Our AI will analyze it against your criteria for what makes a good QA engineer.
+          Upload a candidate's CV in PDF, DOCX, or TXT format. Our AI will analyze it against our standardized criteria for what makes a good QA engineer.
         </Typography>
         
         {error && (
@@ -147,17 +140,6 @@ const UploadPage: React.FC = () => {
           )}
         </Box>
         
-        <TextField
-          label="Custom Criteria (Optional)"
-          multiline
-          rows={4}
-          fullWidth
-          placeholder="Enter specific criteria for evaluating QA Engineers. If left empty, we'll use your saved criteria or our default criteria."
-          value={criteria}
-          onChange={(e) => setCriteria(e.target.value)}
-          sx={{ mb: 3 }}
-        />
-        
         <Button
           variant="contained"
           color="primary"
@@ -182,7 +164,7 @@ const UploadPage: React.FC = () => {
           </li>
           <li>
             <Typography variant="body2">
-              For more accurate analysis, define your criteria for what makes a good QA Engineer
+              For more information about our evaluation criteria, visit the Criteria page
             </Typography>
           </li>
           <li>

@@ -72,6 +72,9 @@ const ResultsPage: React.FC = () => {
 
       try {
         const response = await axios.get(`${config.apiUrl}/api/results/${id}`);
+        console.log('Result data:', response.data);
+        console.log('Justification type:', typeof response.data.result.justification);
+        console.log('Justification value:', response.data.result.justification);
         setResultData(response.data);
       } catch (error) {
         console.error('Error fetching result:', error);

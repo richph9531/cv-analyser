@@ -97,15 +97,10 @@ def get_result(result_id):
 
 @app.route('/api/criteria', methods=['POST'])
 def save_criteria():
-    criteria = request.json.get('criteria', '')
-    
-    if not criteria:
-        return jsonify({'error': 'No criteria provided'}), 400
-    
-    with open(CRITERIA_FILE, 'w') as f:
-        json.dump({'criteria': criteria}, f)
-    
-    return jsonify({'success': True})
+    # This endpoint has been disabled to prevent frontend modification of criteria
+    return jsonify({
+        'error': 'This feature has been disabled. Criteria can only be modified by administrators.'
+    }), 403
 
 @app.route('/api/criteria', methods=['GET'])
 def get_criteria():
