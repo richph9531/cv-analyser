@@ -12,9 +12,10 @@ app = Flask(__name__)
 CORS(app)
 
 # Configure upload folder
-UPLOAD_FOLDER = '../data/uploads'
-RESULTS_FOLDER = '../data/results'
-CRITERIA_FILE = '../data/criteria.json'
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'data', 'uploads')
+RESULTS_FOLDER = os.path.join(BASE_DIR, 'data', 'results')
+CRITERIA_FILE = os.path.join(BASE_DIR, 'data', 'criteria.json')
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt'}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)

@@ -21,7 +21,8 @@ def analyze_cv(cv_text, criteria_text=None):
     """
     # If no criteria provided, try to load from file
     if not criteria_text:
-        criteria_path = os.path.join('../data', 'criteria.json')
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        criteria_path = os.path.join(base_dir, 'data', 'criteria.json')
         if os.path.exists(criteria_path):
             with open(criteria_path, 'r') as f:
                 criteria_data = json.load(f)
