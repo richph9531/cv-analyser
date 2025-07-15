@@ -193,50 +193,24 @@ def validate_and_correct_result(result):
     4. "TESTING_KNOWLEDGE" and "QUALITY_FOCUSED" MUST be among the categories with "Strong evidence"
     """
     try:
-        # Extract the assessment data
-        assessment = result.get('assessment', {})
-        categories = assessment.get('categories', {})
-        
-        # Count the evidence levels
-        weak_or_no_evidence = False
-        strong_evidence_count = 0
-        testing_knowledge_strong = False
-        quality_focused_strong = False
-        
-        # Check each category
-        for category, data in categories.items():
-            rating = data.get('rating', '').lower()
+        # Check if we have category assessments to validate
+        if 'category_assessments' not in result:
+            return result
             
-            # Check for weak or no evidence
-            if 'weak' in rating or 'no' in rating:
-                weak_or_no_evidence = True
-            
-            # Count strong evidence
-            if 'strong' in rating:
-                strong_evidence_count += 1
-                
-                # Check specific required categories
-                if category == 'TESTING_KNOWLEDGE':
-                    testing_knowledge_strong = True
-                elif category == 'QUALITY_FOCUSED':
-                    quality_focused_strong = True
+        # Check if any category has 'Weak evidence' or 'No evidence'
+        has_weak_or_no_evidence = False
+        for category, assessment in result['category_assessments'].items():
+            if assessment.get('evidence_level') in ['Weak evidence', 'No evidence']:
+                has_weak_or_no_evidence = True
+                break
         
-        # Apply the rules
-        should_pass = (
-            not weak_or_no_evidence and
-            strong_evidence_count >= 4 and
-            testing_knowledge_strong and
-            quality_focused_strong
-        )
+        # Store original decision to check if it changes
+        original_decision = result.get('decision')
         
-        # Override the result if necessary
-        if result.get('pass') != should_pass:
-            print(f"Correcting pass/fail assessment. AI said: {result.get('pass')}, Rules say: {should_pass}")
-            result['pass'] = should_pass
-            
-            # Adjust confidence if needed
-            if not should_pass and result.get('confidence', 0) > 69:
-                result['confidence'] = 69  # Below 70% is automatic fail
+        # If there's weak or no evidence in any category, ensure the decision is 'Fail'
+        if has_weak_or_no_evidence and original_decision == 'Pass':
+            # Change the decision to Fail
+            result['decision'] = 'Fail'
             
             # Add a note about the correction
             if 'justification' in result:
