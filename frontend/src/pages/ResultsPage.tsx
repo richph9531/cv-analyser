@@ -38,7 +38,7 @@ interface ResultData {
   result: {
     decision: string;
     confidence: number;
-    justification: string[];
+    justification: string[] | string;
     strengths: string[];
     improvement_areas: string[];
     category_assessments?: {
@@ -230,16 +230,22 @@ const ResultsPage: React.FC = () => {
           Justification
         </Typography>
         <Divider sx={{ mb: 2 }} />
-        <List>
-          {result.justification.map((point, index) => (
-            <ListItem key={index}>
-              <ListItemIcon>
-                <StarIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText primary={point} />
-            </ListItem>
-          ))}
-        </List>
+        {Array.isArray(result.justification) ? (
+          <List>
+            {result.justification.map((point, index) => (
+              <ListItem key={index}>
+                <ListItemIcon>
+                  <StarIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText primary={point} />
+              </ListItem>
+            ))}
+          </List>
+        ) : (
+          <Typography variant="body1" sx={{ whiteSpace: 'pre-line', pl: 2 }}>
+            {result.justification}
+          </Typography>
+        )}
       </Paper>
 
       {result.category_assessments && (
