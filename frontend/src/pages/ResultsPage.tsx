@@ -24,6 +24,7 @@ import StarIcon from '@mui/icons-material/Star';
 import WarningIcon from '@mui/icons-material/Warning';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios';
+import config from '../config';
 
 interface CategoryAssessment {
   rating: string;
@@ -70,7 +71,7 @@ const ResultsPage: React.FC = () => {
       }
 
       try {
-        const response = await axios.get(`http://localhost:5001/api/results/${id}`);
+        const response = await axios.get(`${config.apiUrl}/api/results/${id}`);
         setResultData(response.data);
       } catch (error) {
         console.error('Error fetching result:', error);

@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import axios from 'axios';
+import config from '../config';
 
 const UploadPage: React.FC = () => {
   const navigate = useNavigate();
@@ -67,7 +68,7 @@ const UploadPage: React.FC = () => {
         formData.append('criteria', criteria);
       }
 
-      const response = await axios.post('http://localhost:5001/api/upload', formData, {
+      const response = await axios.post(`${config.apiUrl}/api/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

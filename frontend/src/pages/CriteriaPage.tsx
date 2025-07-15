@@ -15,6 +15,7 @@ import {
 import SaveIcon from '@mui/icons-material/Save';
 import InfoIcon from '@mui/icons-material/Info';
 import axios from 'axios';
+import config from '../config';
 
 const CriteriaPage: React.FC = () => {
   const [criteria, setCriteria] = useState<string>('');
@@ -26,7 +27,7 @@ const CriteriaPage: React.FC = () => {
   useEffect(() => {
     const fetchCriteria = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/criteria');
+        const response = await axios.get(`${config.apiUrl}/api/criteria`);
         setCriteria(response.data.criteria || '');
       } catch (error) {
         console.error('Error fetching criteria:', error);
@@ -45,7 +46,7 @@ const CriteriaPage: React.FC = () => {
     setError(null);
 
     try {
-      await axios.post('http://localhost:5001/api/criteria', { criteria });
+      await axios.post(`${config.apiUrl}/api/criteria`, { criteria });
       setSaveSuccess(true);
     } catch (error) {
       console.error('Error saving criteria:', error);

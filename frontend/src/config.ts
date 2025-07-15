@@ -6,8 +6,8 @@ const config = {
   },
   // Production environment (when deployed to GitHub Pages)
   production: {
-    // Update this with your actual Render backend URL
-    apiUrl: process.env.REACT_APP_API_URL || 'https://cv-analyzer-backend.onrender.com'
+    // Deployed backend URL on Render
+    apiUrl: process.env.REACT_APP_API_URL || 'https://cv-analyser-f1yn.onrender.com'
   }
 };
 
