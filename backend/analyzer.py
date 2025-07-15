@@ -66,8 +66,8 @@ def analyze_cv(cv_text, criteria_text=None):
     
     BALANCED EVALUATION INSTRUCTIONS - FOLLOW THESE EXACTLY:
     - Be thorough and critical in your evaluation, but also fair and realistic
-    - For a candidate to PASS, they must meet ALL of the following criteria:
-      1. NO areas assessed as "Weak evidence" or "No evidence"
+    - For a candidate to PASS, they must meet ALL of the following criteria WITHOUT EXCEPTION:
+      1. NO areas assessed as "Weak evidence" or "No evidence" - ANY WEAK OR NO EVIDENCE MEANS AUTOMATIC FAIL
       2. Each of the 9 categories must have at least "Moderate evidence"
       3. At least FOUR categories must be rated as "Strong evidence"
       4. "TESTING_KNOWLEDGE" and "QUALITY_FOCUSED" MUST be among the categories with "Strong evidence"
@@ -82,8 +82,8 @@ def analyze_cv(cv_text, criteria_text=None):
       * 70-79%: Strong evidence in exactly 4 categories including the required ones
       * Below 70%: Automatic FAIL
     - Pay particular attention to evidence for testing knowledge, quality focus, and analytical skills
-    - IMPORTANT: The candidate MUST FAIL if ANY of these conditions are not met:
-      1. No weak or missing evidence in any category
+    - IMPORTANT: Double-check your assessment before finalizing. The candidate MUST FAIL if ANY of these conditions are not met:
+      1. No weak or missing evidence in any category (ANY "Weak evidence" or "No evidence" means AUTOMATIC FAIL)
       2. At least moderate evidence in all categories
       3. Strong evidence in at least four categories
       4. Both "TESTING_KNOWLEDGE" and "QUALITY_FOCUSED" must have strong evidence
@@ -173,15 +173,88 @@ def analyze_cv(cv_text, criteria_text=None):
         
         # Parse the JSON response
         result = json.loads(response)
-        return result
+        
+        # Validate the result against our rules
+        return validate_and_correct_result(result)
     
     except Exception as e:
         print(f"Error analyzing CV: {e}")
         # Return a fallback response
-        return {
-            "decision": "ERROR",
-            "confidence": 0,
-            "justification": [f"Error analyzing CV: {str(e)}"],
-            "strengths": [],
-            "improvement_areas": ["Could not analyze CV properly"]
-        }
+        return fallback_response(str(e))
+
+
+def validate_and_correct_result(result):
+    """
+    Validates the AI-generated result against our rules and corrects it if necessary.
+    Rules for PASS:
+    1. NO areas assessed as "Weak evidence" or "No evidence"
+    2. Each category must have at least "Moderate evidence"
+    3. At least FOUR categories must be rated as "Strong evidence"
+    4. "TESTING_KNOWLEDGE" and "QUALITY_FOCUSED" MUST be among the categories with "Strong evidence"
+    """
+    try:
+        # Extract the assessment data
+        assessment = result.get('assessment', {})
+        categories = assessment.get('categories', {})
+        
+        # Count the evidence levels
+        weak_or_no_evidence = False
+        strong_evidence_count = 0
+        testing_knowledge_strong = False
+        quality_focused_strong = False
+        
+        # Check each category
+        for category, data in categories.items():
+            rating = data.get('rating', '').lower()
+            
+            # Check for weak or no evidence
+            if 'weak' in rating or 'no' in rating:
+                weak_or_no_evidence = True
+            
+            # Count strong evidence
+            if 'strong' in rating:
+                strong_evidence_count += 1
+                
+                # Check specific required categories
+                if category == 'TESTING_KNOWLEDGE':
+                    testing_knowledge_strong = True
+                elif category == 'QUALITY_FOCUSED':
+                    quality_focused_strong = True
+        
+        # Apply the rules
+        should_pass = (
+            not weak_or_no_evidence and
+            strong_evidence_count >= 4 and
+            testing_knowledge_strong and
+            quality_focused_strong
+        )
+        
+        # Override the result if necessary
+        if result.get('pass') != should_pass:
+            print(f"Correcting pass/fail assessment. AI said: {result.get('pass')}, Rules say: {should_pass}")
+            result['pass'] = should_pass
+            
+            # Adjust confidence if needed
+            if not should_pass and result.get('confidence', 0) > 69:
+                result['confidence'] = 69  # Below 70% is automatic fail
+            
+            # Add a note about the correction
+            if 'justification' in result:
+                result['justification'] += "\n\n[NOTE: This assessment was automatically corrected to follow the strict evaluation criteria. Any category with 'Weak evidence' or 'No evidence' results in an automatic fail.]"
+        
+        return result
+    
+    except Exception as e:
+        print(f"Error validating result: {e}")
+        # Return the original result if validation fails
+        return result
+
+
+def fallback_response(error_msg):
+    return {
+        "decision": "ERROR",
+        "confidence": 0,
+        "justification": [f"Error analyzing CV: {error_msg}"],
+        "strengths": [],
+        "improvement_areas": ["Could not analyze CV properly"]
+    }
